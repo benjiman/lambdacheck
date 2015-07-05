@@ -16,7 +16,7 @@ public class StringSpecification extends Properties<String> {{
             .map(Object::toString);
 
     property("startsWith").forAll(generator, (a,b) ->
-            (a+b).startsWith(a)
+        (a+b).startsWith(a)
     );
 
     property("thisWillFail").forAll(generator, (a,b) ->

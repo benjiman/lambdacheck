@@ -44,6 +44,7 @@ public class PropertyBasedTest extends Runner {
                 property.check().run();
                 notifier.fireTestFinished(desc);
             } catch (Exception e) {
+
                 notifier.fireTestFailure(new Failure(desc, e));
             }
         });
