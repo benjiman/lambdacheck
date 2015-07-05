@@ -24,3 +24,27 @@ public class StringSpecification extends Properties<String> {{
 ```
 
 ![Screenshot](http://files.benjiweber.co.uk/b/lambdacheck.png)
+
+
+```java
+
+You can also mix-in generators you have already writen without having to specify them in the test
+
+@RunWith(PropertyBasedTest.class)
+public class SpecificationWithImplicitGenerator extends Properties<Integer> implements IntegerGenerator {{
+    property("multiplication is commutative").forAll((a,b) ->
+        a*b == b*a
+    );
+
+    property("will fail").forAll((a,b) ->
+        a*b == b*a*a
+    );
+}}
+
+interface IntegerGenerator extends ImplicitGenerator<Integer> {
+    default Stream<Integer> inputs() {
+        return IntStream.generate(new Random()::nextInt)
+            .boxed();
+    }
+}
+```
