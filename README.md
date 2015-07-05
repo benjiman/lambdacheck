@@ -1,5 +1,6 @@
 # lambdacheck
 Quick attempt at cloning of scalacheck for Property Based Testing. (Just a spike, not ready for use)
+If you want something real, look at [lambda-behave](https://github.com/RichardWarburton/lambda-behave)
 
 Specify properties with lambdas, executed by JUnit so it can run in existing suites.
 
