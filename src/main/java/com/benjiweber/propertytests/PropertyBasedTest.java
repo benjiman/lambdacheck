@@ -1,18 +1,24 @@
 package com.benjiweber.propertytests;
 
+import org.junit.Ignore;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.ParentRunner;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
+
+import java.util.List;
 
 import static org.junit.runner.Description.createTestDescription;
 
-public class PropertyBasedTest extends Runner {
+public class PropertyBasedTest extends ParentRunner<Property> {
     private final Properties<?> test;
     private Class<? extends Properties<?>> klass;
 
     public PropertyBasedTest(Class<? extends Properties<?>> klass) throws InitializationError {
+        super(klass);
         this.klass = klass;
         try {
             this.test = klass.newInstance();
@@ -27,26 +33,26 @@ public class PropertyBasedTest extends Runner {
     }
 
     @Override
-    public Description getDescription() {
-        Description description = createTestDescription(klass, klass.getSimpleName());
-        test.properties.stream().forEach(
-            property -> description.addChild(createTestDescription(klass, property.name()))
-        );
-        return description;
+    protected List<Property> getChildren() {
+        return test.properties;
     }
 
     @Override
-    public void run(RunNotifier notifier) {
-        test.properties.forEach(property -> {
-            Description desc = createTestDescription(klass, property.name());
-            try {
-                notifier.fireTestStarted(desc);
-                property.check().run();
-                notifier.fireTestFinished(desc);
-            } catch (Exception e) {
+    protected Description describeChild(Property child) {
+        return createTestDescription(klass, child.name());
+    }
 
-                notifier.fireTestFailure(new Failure(desc, e));
+    @Override
+    protected void runChild(Property child, RunNotifier notifier) {
+        Description description = describeChild(child);
+        runLeaf(statementFrom(child), description, notifier);
+    }
+
+    private static Statement statementFrom(Property property) {
+        return new Statement() {
+            public void evaluate() throws Throwable {
+                property.check().run();
             }
-        });
+        };
     }
 }
